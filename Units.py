@@ -24,18 +24,12 @@ class Unit():
         self.y += y
 
     def get_pos(self):
-        return self.x, self.y
+        return (self.x, self.y)
 
 
 class Ghost(Unit):
     def __init__(self, health, speed, damage, agility, x, y):
-        self.health = health
-        self.speed = speed
-        self.damage = damage
-        self.agility = agility
-        self.x = x
-        self.y = y
-        self.is_dead = False
+        Unit.__init__(self, health, speed, damage, agility, x, y)
         self.hitbox = pygame.Rect(x, y, 40, 40)
 
     def chase(self, hero_x, hero_y):
@@ -59,16 +53,10 @@ class Ghost(Unit):
 
 
 class Hero(Unit):
-    def __init__(self, x, y):
-        self.health = 100
-        self.speed = 5
-        self.damage = 10
-        self.agility = 1
-        self.mana = 100
-        self.is_dead = False
-        self.hitbox = pygame.Rect(x, y, 50, 50)
-        self.x = x
-        self.y = y
+    def __init__(self, health, speed, damage, agility,  mana, x, y, hitbox_width, hitbox_heigth):
+        Unit.__init__(self, health, speed, damage, agility, x, y)
+        self.mana = mana
+        self.hitbox = pygame.Rect(x, y, hitbox_width, hitbox_heigth)
 
 
     def do_shoot(self):
