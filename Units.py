@@ -74,19 +74,19 @@ class Hero(Unit):
         if walkcount + 1 >= 12:
             walkcount = 0
         if click_status[pygame.K_d] == 1:
-            screen.blit(walkRight[walkcount // 3], (self.x - 17, self.y - 7))
+            screen.blit(walkRight[walkcount // 3], (self.x - 25, self.y - 15))
             walkcount += 1
         elif click_status[pygame.K_a] == 1:
-            screen.blit(walkLeft[walkcount // 3], (self.x - 17, self.y - 7))
+            screen.blit(walkLeft[walkcount // 3], (self.x - 25, self.y - 15))
             walkcount += 1
         elif click_status[pygame.K_w] == 1 and click_status[pygame.K_d] == 0 and click_status[pygame.K_a] == 0:
-            screen.blit(walkUP[walkcount // 3], (self.x - 17, self.y - 7))
+            screen.blit(walkUP[walkcount // 3], (self.x - 25, self.y - 15))
             walkcount += 1
         elif click_status[pygame.K_s] == 1 and click_status[pygame.K_d] == 0 and click_status[pygame.K_a] == 0:
-            screen.blit(walkDOWN[walkcount // 3], (self.x - 17, self.y - 7))
+            screen.blit(walkDOWN[walkcount // 3], (self.x - 25, self.y - 15))
             walkcount += 1
         else:
-            screen.blit(stand, (self.x - 17, self.y - 7))
+            screen.blit(stand, (self.x - 25, self.y - 15))
 
     def step_fence(self, move, W=WIDTH, H=HEIGHT):
         if self.get_pos()[0] + move[0] < -1:
@@ -135,4 +135,12 @@ class Bullet():
         if self.x + self.radius > ghost.x and self.x - self.radius < ghost.x + ghost.hitbox.size[0]:
             if self.y + self.radius > ghost.y and self.y - self.radius < ghost.y + ghost.hitbox.size[1]:
                 return True
+        return False
+
+    def collide_with_wall(self):
+        if self.x + self.radius > WIDTH or self.x - self.radius < 0:
+            return True
+        if self.y + self.radius > HEIGHT or self.y - self.radius < 0:
+            return True
+        return False
 
