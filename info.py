@@ -1,9 +1,10 @@
 import pygame
-from Units2 import *
+from Units import *
 #color_rgb
 RED=(204,0,0)
 WHITE=(255,255,255)
 GREY=(120, 120, 120)
+YELLOW=(255,255,153)
 
 
 #screen
@@ -13,6 +14,8 @@ FPS = 60
 
 #hero_information
 
+#items
+Items=[]
 
 #move_button_status
 click_status = {pygame.K_w: 0, pygame.K_s: 0, pygame.K_d: 0, pygame.K_a: 0}
