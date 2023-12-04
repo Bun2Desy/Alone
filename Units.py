@@ -1,4 +1,4 @@
-from random import randint
+from random import randint, choices
 import pygame
 from info import *
 
@@ -28,9 +28,9 @@ class Unit():
 
 
 class Ghost(Unit):
-    def __init__(self, health, speed, damage, agility, x, y):
+    def __init__(self, health, speed, damage, agility, x, y, hitbox_width, hitbox_height):
         Unit.__init__(self, health, speed, damage, agility, x, y)
-        self.hitbox = pygame.Rect(x, y, 40, 40)
+        self.hitbox = pygame.Rect(x, y, hitbox_width, hitbox_height)
 
     def chase(self, hero_x, hero_y):
         ghost_x = self.x
@@ -74,22 +74,21 @@ class Hero(Unit):
         if walkcount + 1 >= 12:
             walkcount = 0
         if click_status[pygame.K_d] == 1:
-            screen.blit(walkRight[walkcount // 3], (self.x - 17, self.y - 7))
+            screen.blit(walkRight[walkcount // 3], (self.x - 25, self.y - 15))
             walkcount += 1
         elif click_status[pygame.K_a] == 1:
-            screen.blit(walkLeft[walkcount // 3], (self.x - 17, self.y - 7))
+            screen.blit(walkLeft[walkcount // 3], (self.x - 25, self.y - 15))
             walkcount += 1
         elif click_status[pygame.K_w] == 1 and click_status[pygame.K_d] == 0 and click_status[pygame.K_a] == 0:
-            screen.blit(walkUP[walkcount // 3], (self.x - 17, self.y - 7))
+            screen.blit(walkUP[walkcount // 3], (self.x - 25, self.y - 15))
             walkcount += 1
         elif click_status[pygame.K_s] == 1 and click_status[pygame.K_d] == 0 and click_status[pygame.K_a] == 0:
-            screen.blit(walkDOWN[walkcount // 3], (self.x - 17, self.y - 7))
+            screen.blit(walkDOWN[walkcount // 3], (self.x - 25, self.y - 15))
             walkcount += 1
         else:
-            screen.blit(stand, (self.x - 17, self.y - 7))
+            screen.blit(stand, (self.x - 25, self.y - 15))
 
     def step_fence(self, move, W=WIDTH, H=HEIGHT):
-        print(self.get_pos())
         if self.get_pos()[0] + move[0] < -1:
             move_x = 1
         elif self.get_pos()[0] + move[0] > W - self.hitbox.width:
@@ -104,3 +103,63 @@ class Hero(Unit):
             move_y = move[1]
         self.hitbox.move_ip((move_x, move_y))
         self.set_pos(move_x, move_y)
+
+
+class Bullet():
+    def __init__(self, hero_pos_x, hero_pos_y, mouse_pos_x, mouse_pos_y):
+        self.x = hero_pos_x + 20
+        self.y = hero_pos_y + 30
+        self.target_x = mouse_pos_x
+        self.target_y = mouse_pos_y
+        self.speed = 3
+        self.radius = 5
+
+    # calculate function using coordinates
+    def culc_function(self):
+        self.delta_y = self.target_y - self.y
+        self.delta_x = self.target_x - self.x
+        if self.delta_x == 0:
+            self.delta_x = 1
+        self.k = self.delta_y / self.delta_x
+        self.b = self.y - self.k * self.x
+        self.speed_of_change = (self.speed ** 2 / (1 + self.k ** 2)) ** 0.5
+
+    def change_coord(self):
+        if self.delta_x >= 0:
+            self.x += self.speed_of_change
+        else:
+            self.x -= self.speed_of_change
+        self.y = self.k * self.x + self.b
+
+    def collide_with_unit(self, ghost):
+        if self.x + self.radius > ghost.x and self.x - self.radius < ghost.x + ghost.hitbox.size[0]:
+            if self.y + self.radius > ghost.y and self.y - self.radius < ghost.y + ghost.hitbox.size[1]:
+                return True
+        return False
+
+    def collide_with_wall(self):
+        if self.x + self.radius > WIDTH or self.x - self.radius < 0:
+            return True
+        if self.y + self.radius > HEIGHT or self.y - self.radius < 0:
+            return True
+        return False
+
+class Item():
+    def __init__(self, item_type,x,y):
+        if item_type == 'key':
+            self.image = pygame.image.load("objects/key.png")
+        elif item_type == 'chakra':
+            self.image = pygame.image.load("objects/chakra.png")
+        self.rect = self.image.get_rect()
+        self.type = item_type
+        self.x = x
+        self.y = y
+        self.hitbox=pygame.Rect(self.x,self.y,32,32)
+
+    def render(self):
+        self.rect.x = self.x
+        self.rect.y = self.y
+        screen.blit(self.image, self.rect)
+    def casino(self):
+        chance=choices([True, False], weights=[50, 50])
+        return chance
