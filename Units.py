@@ -163,3 +163,11 @@ class Item():
     def casino(self):
         chance=choices([True, False], weights=[50, 50])
         return chance
+    def collision(self,hero):
+        if self.hitbox.colliderect(hero.hitbox):
+            if self.type == 'chakra':
+                hero.mana += 10
+                Items.remove(self)
+            if self.type == 'key':
+                Items.remove(self)
+                return True
