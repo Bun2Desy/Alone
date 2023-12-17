@@ -1,23 +1,23 @@
-from random import randint, choices
+rom random import randint, choices
 import pygame
 from info import *
 
+
+
 class Unit():
-    def __init__(self, health, speed, damage, agility, x, y):
-        self.health = health
-        self.speed = speed
-        self.damage = damage
-        self.agility = agility
+    def __init__(self, x, y):
+        '''Assigns coordinate values and create unit objects
+        :param x: x-axis coordinate
+        :type x: float
+        :param y: y-axis coordinate
+        :type y: float
+        :returns: None
+        :raises InvalidCoordinatesError: if x
+        '''
+        self.speed = 3
         self.is_dead = False
         self.x = x
         self.y = y
-
-    def is_alive(self):
-        if self.health <= 0:
-            self.is_dead = True
-
-    def get_damage(self, damage):
-        self.health -= damage
 
     def set_pos(self, x, y):
         self.x += x
@@ -28,8 +28,9 @@ class Unit():
 
 
 class Ghost(Unit):
-    def __init__(self, health, speed, damage, agility, x, y, hitbox_width, hitbox_height):
-        Unit.__init__(self, health, speed, damage, agility, x, y)
+    def __init__(self, x, y, hitbox_width, hitbox_height):
+        Unit.__init__(self, x, y)
+        self.speed = 1
         self.hitbox = pygame.Rect(x, y, hitbox_width, hitbox_height)
 
     def chase(self, hero_x, hero_y):
@@ -50,24 +51,34 @@ class Ghost(Unit):
         self.set_pos(change_pos[0], change_pos[1])
 
 
-
-
 class Hero(Unit):
-    def __init__(self, health, speed, damage, agility,  mana, x, y, hitbox_width, hitbox_heigth):
-        Unit.__init__(self, health, speed, damage, agility, x, y)
-        self.mana = mana
+    def __init__(self, x, y, hitbox_width, hitbox_heigth, name, difficulty):
+        Unit.__init__(self, x, y)
+        if difficulty == "Normal":
+            self.health = 3
+        elif difficulty == "Hard":
+            self.health = 2
+        else:
+            self.health = 1
+        self.mana = 5
         self.hitbox = pygame.Rect(x, y, hitbox_width, hitbox_heigth)
+        self.name = name
+        self.score = 0
+        self.difficulty = difficulty
 
+    def start_pos(self, x, y):
+        self.x = x
+        self.y = y
+        self.hitbox.x = self.x
+        self.hitbox.y = self.y
 
     def do_shoot(self):
-        self.mana -= 5
+        self.mana -= 1
 
     def restore_mana(self):
-        point_mana = randint(2, 4)
-        if self.mana + point_mana > 100:
-            self.mana = 100
-        else:
-            self.mana += point_mana
+        self.mana += 2
+        if self.mana > 5:
+            self.mana = 5
 
     def redrawgamehero(self):
         global walkcount
@@ -88,21 +99,54 @@ class Hero(Unit):
         else:
             screen.blit(stand, (self.x - 25, self.y - 15))
 
-    def step_fence(self, move, W=WIDTH, H=HEIGHT):
-        if self.get_pos()[0] + move[0] < -1:
-            move_x = 1
-        elif self.get_pos()[0] + move[0] > W - self.hitbox.width:
-            move_x = -1
+    def draw_health(self, screen):
+        if self.difficulty == "Normal":
+            if self.health == 3:
+                screen.blit(pygame.transform.scale(pygame.image.load('objects/heart.png'), (70, 70)), (WIDTH - 120, 10))
+                screen.blit(pygame.transform.scale(pygame.image.load('objects/heart.png'), (70, 70)), (WIDTH - 90, 10))
+                screen.blit(pygame.transform.scale(pygame.image.load('objects/heart.png'), (70, 70)), (WIDTH - 60, 10))
+            elif self.health == 2:
+                screen.blit(pygame.transform.scale(pygame.image.load('objects/heart.png'), (70, 70)), (WIDTH - 120, 10))
+                screen.blit(pygame.transform.scale(pygame.image.load('objects/heart.png'), (70, 70)), (WIDTH - 90, 10))
+                screen.blit(pygame.transform.scale(pygame.image.load('objects/mybroken_heart.png'), (70, 70)),
+                            (WIDTH - 60, 10))
+            elif self.health == 1:
+                screen.blit(pygame.transform.scale(pygame.image.load('objects/heart.png'), (70, 70)), (WIDTH - 120, 10))
+                screen.blit(pygame.transform.scale(pygame.image.load('objects/mybroken_heart.png'), (70, 70)),
+                            (WIDTH - 90, 10))
+                screen.blit(pygame.transform.scale(pygame.image.load('objects/mybroken_heart.png'), (70, 70)),
+                            (WIDTH - 60, 10))
+        elif self.difficulty == "Hard":
+            if self.health == 2:
+                screen.blit(pygame.transform.scale(pygame.image.load('objects/heart.png'), (70, 70)), (WIDTH - 90, 10))
+                screen.blit(pygame.transform.scale(pygame.image.load('objects/heart.png'), (70, 70)), (WIDTH - 60, 10))
+            elif self.health == 1:
+                screen.blit(pygame.transform.scale(pygame.image.load('objects/heart.png'), (70, 70)), (WIDTH - 90, 10))
+                screen.blit(pygame.transform.scale(pygame.image.load('objects/mybroken_heart.png'), (70, 70)),
+                            (WIDTH - 60, 10))
         else:
-            move_x = move[0]
-        if self.get_pos()[1] + move[1] < -1:
-            move_y = 1
-        elif self.get_pos()[1] + move[1] > H - self.hitbox.height:
-            move_y = -1
-        else:
-            move_y = move[1]
-        self.hitbox.move_ip((move_x, move_y))
-        self.set_pos(move_x, move_y)
+            if self.health == 1:
+                screen.blit(pygame.transform.scale(pygame.image.load('objects/heart.png'), (70, 70)), (WIDTH - 60, 10))
+
+    def draw_mana(self, screen):
+        start_coord = 60
+        for i in range(5 - self.mana):
+            screen.blit(pygame.transform.scale(pygame.image.load('objects/lack_of_mana_point.png'), (70, 70)),
+                        (WIDTH - start_coord, 30))
+            start_coord += 30
+        for i in range(self.mana):
+            screen.blit(pygame.transform.scale(pygame.image.load('objects/mana_point.png'), (70, 70)),
+                        (WIDTH - start_coord, 30))
+            start_coord += 30
+
+    def step_fence(self, move, blocks):
+        for i in blocks:
+            if i.colliderect(self.hitbox):
+                move_x = -move[0]
+                move_y = -move[1]
+                self.hitbox.move_ip((move_x, move_y))
+                self.set_pos(move_x, move_y)
+                break
 
 
 class Bullet():
@@ -137,15 +181,15 @@ class Bullet():
                 return True
         return False
 
-    def collide_with_wall(self):
-        if self.x + self.radius > WIDTH or self.x - self.radius < 0:
-            return True
-        if self.y + self.radius > HEIGHT or self.y - self.radius < 0:
-            return True
+    def collide_with_wall(self, blocks):
+        for b in blocks:
+            if b.collidepoint(self.x, self.y):
+                return True
         return False
 
+
 class Item():
-    def __init__(self, item_type,x,y):
+    def __init__(self, item_type, x, y):
         if item_type == 'key':
             self.image = pygame.image.load("objects/key.png")
         elif item_type == 'chakra':
@@ -154,20 +198,58 @@ class Item():
         self.type = item_type
         self.x = x
         self.y = y
-        self.hitbox=pygame.Rect(self.x,self.y,32,32)
+        self.hitbox = pygame.Rect(self.x, self.y, 32, 32)
 
     def render(self):
         self.rect.x = self.x
         self.rect.y = self.y
         screen.blit(self.image, self.rect)
+
     def casino(self):
-        chance=choices([True, False], weights=[50, 50])
+        chance = choices([True, False], weights=[50, 50])
         return chance
-    def collision(self,hero):
+
+    def collision(self, hero):
         if self.hitbox.colliderect(hero.hitbox):
             if self.type == 'chakra':
-                hero.mana += 10
+                hero.restore_mana()
                 Items.remove(self)
             if self.type == 'key':
                 Items.remove(self)
                 return True
+
+
+class Door:
+    def __init__(self, type_door, door_box):
+        self.type_door = type_door
+        self.door_box = door_box
+
+    def draw(self, hero, open_door):
+        if self.type_door == 'exit_door':
+            if self.openy(hero, open_door):
+                self.image = pygame.transform.scale(pygame.image.load('objects/open_door.png'),
+                                                    (self.door_box.width, self.door_box.height))
+                screen.blit(self.image, (self.door_box.x, self.door_box.y))
+            else:
+                self.image = pygame.transform.scale(pygame.image.load('objects/close_door.png'),
+                                                    (self.door_box.width, self.door_box.height))
+                screen.blit(self.image, (self.door_box.x, self.door_box.y))
+        else:
+            self.image = pygame.transform.scale(pygame.image.load('objects/enter_door.png'),
+                                                (self.door_box.width, self.door_box.height))
+            screen.blit(self.image, (self.door_box.x, self.door_box.y))
+
+    def openy(self, hero, open_door):
+        if self.door_box.colliderect(hero.hitbox) and open_door:
+            return True
+
+
+class Score:
+    def __init__(self, kills, room_number):
+        self.kills = kills
+        self.room_number = room_number
+        self.smallfont = pygame.font.SysFont('Corbel', 20)
+
+    def kill_and_room_count(self, screen):
+        screen.blit(self.smallfont.render('kills:' + str(self.kills), True, (0, 0, 0)), (WIDTH - 100, 90))
+        screen.blit(self.smallfont.render('room' + ' №' + str(self.room_number), True, (0, 0, 0)), (WIDTH - 100, 110))
