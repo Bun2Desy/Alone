@@ -1,18 +1,17 @@
-rom random import randint, choices
+from random import randint, choices
 import pygame
 from info import *
-
 
 
 class Unit():
     def __init__(self, x, y):
         '''Assigns coordinate values and create unit objects
         :param x: x-axis coordinate
-        :type x: float
+        :type x: int
         :param y: y-axis coordinate
-        :type y: float
+        :type y: int
         :returns: None
-        :raises InvalidCoordinatesError: if x
+        :raises InvalidCoordinatesError: if x or y out of screen size
         '''
         self.speed = 3
         self.is_dead = False
@@ -20,20 +19,48 @@ class Unit():
         self.y = y
 
     def set_pos(self, x, y):
+        '''Changes coordinates due to using move_vector=(x,y)
+        :param x: x-axis coordinate of vector
+        :type x: int
+        :param y: y-axis coordinate of vector
+        :type y: int
+        :returns: None
+        '''
         self.x += x
         self.y += y
 
     def get_pos(self):
+        '''Gives Unit position
+        :returns: (self.x,self.y)
+        :rtype: tuple
+        '''
         return (self.x, self.y)
 
 
 class Ghost(Unit):
     def __init__(self, x, y, hitbox_width, hitbox_height):
+        '''Assigns coordinate values and create unit objects
+        :param x: x-axis coordinate
+        :type x: int
+        :param y: y-axis coordinate
+        :type y: int
+        :param hitbox_width: hitbox width
+        :type hitbox_width: int
+        :param hitbox_height: hitbox height
+        :type hitbox_height: int
+        '''
         Unit.__init__(self, x, y)
         self.speed = 1
         self.hitbox = pygame.Rect(x, y, hitbox_width, hitbox_height)
 
     def chase(self, hero_x, hero_y):
+        '''Changes ghost position relative to hero_x and hero_y
+        :param hero_x: x-axis hero coordinate
+        :type hero_x: int
+        :param hero_y: y-axis hero coordinate
+        :type hero_y: int
+        :returns: None
+        '''
         ghost_x = self.x
         ghost_y = self.y
         change_x = 0
@@ -67,20 +94,39 @@ class Hero(Unit):
         self.difficulty = difficulty
 
     def start_pos(self, x, y):
+        '''Changes hero position to (x,y)
+        :param x: x-axis coordinate
+        :type x: int
+        :param y: y-axis coordinate
+        :type y: int
+        :returns: None
+        :raises InvalidCoordinatesError: if x or y out of display size
+        '''
         self.x = x
         self.y = y
         self.hitbox.x = self.x
         self.hitbox.y = self.y
 
     def do_shoot(self):
+        '''Subtracts one point from mana
+        :returns: None
+        '''
         self.mana -= 1
 
     def restore_mana(self):
+        '''Adds points to mana
+        :returns: None
+        '''
         self.mana += 2
         if self.mana > 5:
             self.mana = 5
 
-    def redrawgamehero(self):
+    def redrawgamehero(self, screen):
+        '''Draws moving sprites of hero on display of game
+        :param screen: display of game
+        :type screen: pygame.surface.Surface
+        :returns: None
+        '''
         global walkcount
         if walkcount + 1 >= 12:
             walkcount = 0
@@ -100,6 +146,11 @@ class Hero(Unit):
             screen.blit(stand, (self.x - 25, self.y - 15))
 
     def draw_health(self, screen):
+        '''Draws hearts sprites of hero on display of game
+        :param screen: display of game
+        :type screen: pygame.surface.Surface
+        :returns: None
+        '''
         if self.difficulty == "Normal":
             if self.health == 3:
                 screen.blit(pygame.transform.scale(pygame.image.load('objects/heart.png'), (70, 70)), (WIDTH - 120, 10))
@@ -129,6 +180,11 @@ class Hero(Unit):
                 screen.blit(pygame.transform.scale(pygame.image.load('objects/heart.png'), (70, 70)), (WIDTH - 60, 10))
 
     def draw_mana(self, screen):
+        '''Draws mana points on display of game
+        :param screen: display of game
+        :type screen: pygame.surface.Surface
+        :returns: None
+        '''
         start_coord = 60
         for i in range(5 - self.mana):
             screen.blit(pygame.transform.scale(pygame.image.load('objects/lack_of_mana_point.png'), (70, 70)),
@@ -140,6 +196,13 @@ class Hero(Unit):
             start_coord += 30
 
     def step_fence(self, move, blocks):
+        '''Checks for contact with walls and prohbition to enter them
+        :param move: coordinates of hero
+        :type move: tuple
+        :param blocks: map blocks
+        :type blocks: list
+        :returns: None
+        '''
         for i in blocks:
             if i.colliderect(self.hitbox):
                 move_x = -move[0]
@@ -200,16 +263,31 @@ class Item():
         self.y = y
         self.hitbox = pygame.Rect(self.x, self.y, 32, 32)
 
-    def render(self):
+    def render(self, screen):
+        '''Draws objects from class Item
+        :param screen: display of game
+        :type screen: pygame.surface.Surface
+        :returns: None
+        '''
         self.rect.x = self.x
         self.rect.y = self.y
         screen.blit(self.image, self.rect)
 
     def casino(self):
+        '''Calculates the probability of a drop
+        :returns: chance
+        :rtype: list
+        '''
         chance = choices([True, False], weights=[50, 50])
         return chance
 
     def collision(self, hero):
+        '''Return True if type=='key' and removes items from display
+        :param hero: hero object
+        :type hero: __main__.Hero
+        :returns: True
+        :rtype: bool
+        '''
         if self.hitbox.colliderect(hero.hitbox):
             if self.type == 'chakra':
                 hero.restore_mana()
@@ -225,6 +303,13 @@ class Door:
         self.door_box = door_box
 
     def draw(self, hero, open_door):
+        '''Draws door sprites on display of game
+        :param hero: hero object
+        :type hero: __main__.Hero
+        :param open_door: door openness
+        :type open_door: bool
+        :returns: None
+        '''
         if self.type_door == 'exit_door':
             if self.openy(hero, open_door):
                 self.image = pygame.transform.scale(pygame.image.load('objects/open_door.png'),
@@ -240,6 +325,14 @@ class Door:
             screen.blit(self.image, (self.door_box.x, self.door_box.y))
 
     def openy(self, hero, open_door):
+        '''Returns True if collision between hero hitbox and door object
+        :param hero: hero object
+        :type hero: __main__.Hero
+        :param open_door: door openness
+        :type open_door: bool
+        :returns: True
+        :rtype: bool
+        '''
         if self.door_box.colliderect(hero.hitbox) and open_door:
             return True
 
@@ -251,5 +344,10 @@ class Score:
         self.smallfont = pygame.font.SysFont('Corbel', 20)
 
     def kill_and_room_count(self, screen):
+        '''Draws count of kills and room number on display of game
+        :param screen: display of game
+        :type screen: pygame.surface.Surface
+        :returns: None
+        '''
         screen.blit(self.smallfont.render('kills:' + str(self.kills), True, (0, 0, 0)), (WIDTH - 100, 90))
         screen.blit(self.smallfont.render('room' + ' №' + str(self.room_number), True, (0, 0, 0)), (WIDTH - 100, 110))
