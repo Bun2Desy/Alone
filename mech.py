@@ -1,61 +1,63 @@
 import random
 import time
-
 import pygame
 from Units import *
 from random import randint
 from info import *
+from Maps import maps_generation
+from sqll import *
 
 pygame.init()
-
-screen=pygame.display.set_mode([WIDTH, HEIGHT])
 clock = pygame.time.Clock()
-last_shoot_time = time.time() + 2000000000
-bullet_radius = 5
+
 game_over = False
 
-hero = Hero(100, 3, 10, 1, 20, 50, 50, 30, 60)
+maxi = 5
+time_spawn = 3000
+pygame.time.set_timer(ghost_timer, time_spawn)
+
+last_damage = time.time()
+
+countghost = 0
+killghost = 0
+kills = 0
+number_room = 0
+
+change = True
 
 
-
-enemi=[]
-maxi=5
-ghost_timer=pygame.USEREVENT+1
-pygame.time.set_timer(ghost_timer,3000)
-bullets = []
-
-
-exitfield=pygame.Rect(300,300,50,50)
-open_door=False
-color=(255,0,0)
-
-countghost=0
-
-while True:
+def hero_game(hero):
+    global game_over, open_door, countghost, change, blocks, blocks_without_door, enter_door, exit_door, number_room, maxi, time_spawn, killghost, kills, last_damage
     if game_over:
-        hero = Hero(100, 3, 10, 1, 100, 50, 50, 30, 60)
+        game_over = False
         bullets.clear()
         enemi.clear()
+        Items.clear()
+        number_room = 0
+        time_spawn = 3000
+        change = True
+        maxi = 5
+        killghost = 0
         for key in click_status:
             click_status[key] = 0
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                game_over = False
-
+        create_table(hero.difficulty)
+        set_score_database(hero.name, kills, hero.difficulty)
+        kills = 0
+        return True
     else:
-        # if time.time() - last_shoot_time >= 1 and hero.mana < 100:
-        #     hero.restore_mana()
-        #     last_shoot_time = time.time()
+        if change:
+            blocks, blocks_without_door, enter_door, exit_door = maps_generation()
+            # hero = Hero(enter_door.door_box.x, enter_door.door_box.y, 30, 60,USERNAME,read_settings()['difficulty'])
+            hero.start_pos(enter_door.door_box.x, enter_door.door_box.y)
+            countghost = 0
+            number_room += 1
+            maxi = number_room + maxi
+            time_spawn -= 100
+            hero.mana = 5
+            change = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-
-            if exitfield.colliderect(hero.hitbox) and open_door==True:
-                color = (0, 255, 0)
-            else:
-                color = (255, 0, 0)
 
             if event.type == pygame.KEYDOWN:
                 if event.key in click_status:
@@ -63,49 +65,67 @@ while True:
             if event.type == pygame.KEYUP:
                 if event.key in click_status:
                     click_status[event.key] = 0
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and hero.mana!=0:
-                bullet = Bullet(hero.get_pos()[0], hero.get_pos()[1], pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and hero.mana != 0:
+                bullet = Bullet(hero.get_pos()[0], hero.get_pos()[1], pygame.mouse.get_pos()[0],
+                                pygame.mouse.get_pos()[1])
                 bullets.append(bullet)
                 bullet.culc_function()
-                if hero.mana >= 5:
+                if hero.mana != 0:
                     hero.do_shoot()
-                    last_shoot_time = time.time()
+            if exit_door.openy(hero, open_door) and event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                screen.fill(GREY)
+                enemi.clear()
+                bullets.clear()
+                Items.clear()
+                open_door = False
+                countghost = 0
+                killghost = 0
+                change = True
 
+            # ghost spawn
+            if event.type == ghost_timer and countghost < maxi:
+                x = randint(indent[0], fence_size[0] // 2)
+                y = randint(indent[1], fence_size[1] // 2)
+                if pygame.Rect(x, y, 35, 35).colliderect(
+                        pygame.Rect(hero.x, hero.y, hero.hitbox.height + 10, hero.hitbox.width + 10)) == False:
+                    enemi.append(Ghost(x, y, 35, 35))
+                    countghost += 1
+        move = (hero.speed * (click_status[pygame.K_d] - click_status[pygame.K_a]),
+                hero.speed * (click_status[pygame.K_s] - click_status[pygame.K_w]))
+        move_x = move[0]
+        move_y = move[1]
+        hero.hitbox.move_ip((move_x, move_y))
+        hero.set_pos(move_x, move_y)
+        hero.step_fence(move, blocks_without_door)
 
-
-    #ghost spawn
-            if event.type == ghost_timer and countghost<maxi:
-                x=randint(0,WIDTH)
-                y=randint(0,HEIGHT)
-                if pygame.Rect(x, y, 35, 35).colliderect(pygame.Rect(hero.x, hero.y, hero.hitbox.height+10, hero.hitbox.width+10))==False:
-                    enemi.append(Ghost(50,1,5,2,x, y, 35, 35))
-        move = (hero.speed * (click_status[pygame.K_d] - click_status[pygame.K_a]), hero.speed * (click_status[pygame.K_s] - click_status[pygame.K_w]))
-        hero.step_fence(move)
-
-        #chase_ghosts
+        # chase_ghosts
         for angry in enemi:
-            angry.chase(hero.x+random.choice([0,25,50]), hero.y+random.choice([0,25,50]))
+            angry.chase(hero.x + random.choice([0, 25, 50]), hero.y + random.choice([0, 25, 50]))
 
         for angry in enemi:
-            if angry.hitbox.colliderect(hero.hitbox):
-                game_over = True
+            if angry.hitbox.colliderect(hero.hitbox) and time.time() - last_damage >= 1:
+                hero.health -= 1
+                last_damage = time.time()
+                # game_over = True
+        if hero.health <= 0:
+            game_over = True
 
-        screen.fill(GREY)
+        # screen.fill(GREY)
+        enter_door.draw(hero, open_door)
+        exit_door.draw(hero, open_door)
 
-        #move_sprite_draw
-        hero.redrawgamehero()
+        # move_sprite_draw
+        hero.redrawgamehero(screen)
 
-        pygame.draw.rect(screen, (255, 255, 255), hero.hitbox, 1)
+        # pygame.draw.rect(screen, WHITE, hero.hitbox, 1)
+        for i in blocks_without_door:
+            pygame.draw.rect(screen, WHITE, i, 1)
 
-        pygame.draw.rect(screen, color, exitfield)
-
-
-        #print(pygame.mouse.get_pos())
         for angry in enemi:
-            screen.blit(ghost_sprites[3], (angry.x - 23, angry.y - 23))
-            pygame.draw.rect(screen, (255, 0, 0), angry.hitbox, 1)
+            screen.blit(ghost_sprite, (angry.x - 23, angry.y - 23))
+            # pygame.draw.rect(screen, RED, angry.hitbox, 1)
 
-        #move_bullets
+
         for bull in bullets:
             pygame.draw.circle(screen, YELLOW, (bull.x, bull.y), bullet_radius)
             bull.change_coord()
@@ -113,35 +133,39 @@ while True:
                 if bull.collide_with_unit(ghost):
                     bullets.remove(bull)
                     ghost.is_dead = True
-                    countghost+=1
-                    if countghost==maxi:
+                    killghost += 1
+                    kills += 1
+                    if killghost == maxi:
                         item_no = 'key'
                         item = Item(item_no, ghost.x, ghost.y)
                         Items.append(item)
                     else:
                         item_no = 'chakra'
                         item = Item(item_no, ghost.x, ghost.y)
-                        if item.casino()==[True]:
+                        if item.casino() == [True]:
                             Items.append(item)
 
                     break
-            if bull.collide_with_wall():
+            if bull.collide_with_wall(blocks):
                 bullets.remove(bull)
 
-        print(len(bullets))
+        # print(len(bullets))
 
         # check_ghost_alive
         for ghost in enemi:
             if ghost.is_dead:
                 enemi.remove(ghost)
-        #draw items
+        # draw items
         for i in Items:
-            i.render()
-            pygame.draw.rect(screen, (0, 0, 255), i.hitbox, 1)
-            if i.hitbox.colliderect(hero.hitbox):
-                open_door=i.collision(hero)
+            i.render(screen)
+            # pygame.draw.rect(screen, (0, 0, 255), i.hitbox, 1)
+            if i.hitbox.colliderect(hero.hitbox) and i.type == "key":
+                open_door = i.collision(hero)
+            elif i.hitbox.colliderect(hero.hitbox):
+                i.collision(hero)
 
-
-    pygame.display.update()
+        Score(kills, number_room).kill_and_room_count(screen)
+        hero.draw_health(screen)
+        hero.draw_mana(screen)
 
     clock.tick(FPS)
