@@ -2,6 +2,15 @@ import sqlite3
 
 
 def set_score_database(name, score, difficulty):
+    '''Load new result in database
+    :param name: hero name
+    :type name: str
+    :param score: hero score
+    :type score: int
+    :param difficulty: game difficulty
+    :type difficulty: str
+    :returns: None
+    '''
     create_table(difficulty)
 
     scoreboard_connect = sqlite3.connect('scoreboard.db')
@@ -29,7 +38,14 @@ def set_score_database(name, score, difficulty):
     scoreboard_connect.commit()
     scoreboard_connect.close()
 
+
 def get_score_database(difficulty):
+    '''Get data from database
+    :param difficulty: game difficulty
+    :type difficulty: str
+    :returns: data from database
+    :rtype: list
+    '''
     create_table(difficulty)
 
     scoreboard_connect = sqlite3.connect('scoreboard.db')
@@ -38,7 +54,13 @@ def get_score_database(difficulty):
     cursor.execute(f'SELECT * FROM {difficulty} ORDER BY score DESC;')
     return cursor.fetchall()
 
+
 def create_table(table_name):
+    '''Create table
+    :param table_name: name of the table
+    :type table_name: str
+    :returns: None
+    '''
     scoreboard_connect = sqlite3.connect('scoreboard.db')
     cursor = scoreboard_connect.cursor()
     cursor.execute(f'''
@@ -48,5 +70,3 @@ def create_table(table_name):
         ''')
     scoreboard_connect.commit()
     scoreboard_connect.close()
-
-print(get_score_database("Hard"))
