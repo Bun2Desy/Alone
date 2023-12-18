@@ -33,7 +33,8 @@ def hero_game(hero):
     :return: True
     :rtype: bool
     """
-    global game_over, open_door, countghost, change, blocks, blocks_without_door, enter_door, exit_door, number_room, maxi, time_spawn, killghost, kills, last_damage
+    global game_over, open_door, countghost, change, blocks, blocks_without_door, enter_door, exit_door, number_room, \
+        maxi, time_spawn, killghost, kills, last_damage
     if game_over:
         game_over = False
         bullets.clear()
@@ -57,13 +58,14 @@ def hero_game(hero):
             countghost = 0
             number_room += 1
             maxi = number_room + maxi
-            time_spawn -= 100
+            if time_spawn != 200:
+                time_spawn -= 200
+            pygame.time.set_timer(ghost_timer, time_spawn)
             hero.mana = 5
             change = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-
             if event.type == pygame.KEYDOWN:
                 if event.key in click_status:
                     click_status[event.key] = 1
@@ -90,10 +92,11 @@ def hero_game(hero):
             if event.type == ghost_timer and countghost < maxi:
                 x = randint(indent[0], fence_size[0])
                 y = randint(indent[1], fence_size[1])
-                if not(pygame.Rect(x, y, 35, 35).colliderect(
+                if not (pygame.Rect(x, y, 35, 35).colliderect(
                         pygame.Rect(hero.x, hero.y, hero.hitbox.height + 10, hero.hitbox.width + 10))):
                     enemi.append(Ghost(x, y, 35, 35))
                     countghost += 1
+
         move = (hero.speed * (click_status[pygame.K_d] - click_status[pygame.K_a]),
                 hero.speed * (click_status[pygame.K_s] - click_status[pygame.K_w]))
         move_x = move[0]

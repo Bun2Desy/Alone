@@ -72,9 +72,10 @@ def maps_generation():
             end_x = end_x
             end_y -= block_size
 
-        if pygame.Rect(end_x, end_y, block_size, block_size).colliderect(fence) == True and pygame.Rect(end_x, end_y,
-                                                                                                        block_size,
-                                                                                                        block_size) not in blocks:
+        if pygame.Rect(end_x, end_y, block_size, block_size).colliderect(fence) and pygame.Rect(end_x, end_y,
+                                                                                                block_size,
+                                                                                                block_size) not in \
+                blocks:
             blocks.append(pygame.Rect(end_x, end_y, block_size, block_size))
     no_enter_door = True
     no_exit_door = True

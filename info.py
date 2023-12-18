@@ -55,14 +55,15 @@ walkLeft = [pygame.transform.scale(pygame.image.load('movesprites/left/LSprite1.
                 'movesprites/left/LSprite4.png'), (80, 80))]
 walkUP = [pygame.transform.scale(pygame.image.load('movesprites/up/UpSprite1.png'), (80, 80)),
           pygame.transform.scale(pygame.image.load(
-              'movesprites/up/UpSprite2.png'), (80, 80)), pygame.transform.scale(pygame.image.load(
-        'movesprites/up/UpSprite3.png'), (80, 80)),
+              'movesprites/up/UpSprite2.png'), (80, 80)), pygame.transform.scale(pygame.image.load('movesprites/up'
+                                                                                                   '/UpSprite3.png'),
+                                                                                 (80, 80)), pygame.transform.scale(
+        pygame.image.load('movesprites/up/UpSprite4.png'), (80, 80)),
           pygame.transform.scale(pygame.image.load(
-              'movesprites/up/UpSprite4.png'), (80, 80)), pygame.transform.scale(pygame.image.load(
-        'movesprites/up/UpSprite5.png'), (80, 80)),
+              'movesprites/up/UpSprite5.png'), (80, 80)),
           pygame.transform.scale(pygame.image.load(
-              'movesprites/up/UpSprite6.png'), (80, 80)), pygame.transform.scale(pygame.image.load(
-        'movesprites/up/UpSprite7.png'), (80, 80)),
+              'movesprites/up/UpSprite6.png'), (80, 80)),
+          pygame.transform.scale(pygame.image.load('movesprites/up/UpSprite7.png'), (80, 80)),
           pygame.transform.scale(pygame.image.load(
               'movesprites/up/UpSprite8.png'), (80, 80))]
 walkDOWN = [pygame.transform.scale(pygame.image.load('movesprites/down/DoSprite1.png'), (80, 80)),
@@ -73,5 +74,5 @@ walkDOWN = [pygame.transform.scale(pygame.image.load('movesprites/down/DoSprite1
             pygame.transform.scale(pygame.image.load('movesprites/down/DoSprite6.png'), (80, 80))]
 stand = pygame.transform.scale(pygame.image.load('movesprites/stand/Sprite-0003.png'), (80, 80))
 
-# move_sprite_ghost
+# move_sprites_lists_ghost
 ghost_sprite = pygame.transform.scale(pygame.image.load('movesprites/enemy/ghostmove4.png'), (80, 80))

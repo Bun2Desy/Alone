@@ -35,6 +35,7 @@ class Slider:
     :param label.rect: rect for text
     :type label_rect: RectType
     """
+
     def __init__(self, pos: tuple, size: tuple, initial_val: float, min: int, max: int):
         """Creates slider object
         :param pos: center position
@@ -60,15 +61,11 @@ class Slider:
         self.min = min
         self.max = max
         self.initial_pos = (self.slider_right_pos - self.slider_left_pos) * initial_val
-        self.initial_val=initial_val
-
+        self.initial_val = initial_val
 
         self.container_rect = pygame.Rect(self.slider_left_pos, self.slider_top_pos, self.size[0], self.size[1])
         self.button_rect = pygame.Rect(self.slider_left_pos + self.initial_pos - 5, self.slider_top_pos, 10,
                                        self.size[1])
-
-
-
 
     def move_slider(self, mouse_pos):
         """Changes position of slider
@@ -103,8 +100,9 @@ class Slider:
         """
         len_container = self.slider_right_pos - self.slider_left_pos
         button_pos = self.button_rect.centerx - self.slider_left_pos
-        self.initial_val = (self.button_rect.centerx - self.slider_left_pos) / (self.slider_right_pos - self.slider_left_pos)
-        volume_val=(button_pos / len_container) * (self.max - self.min) + self.min
+        self.initial_val = (self.button_rect.centerx - self.slider_left_pos) / (
+                    self.slider_right_pos - self.slider_left_pos)
+        volume_val = (button_pos / len_container) * (self.max - self.min) + self.min
         return volume_val
 
     def display_value(self):
@@ -115,4 +113,3 @@ class Slider:
         self.label_rect = self.text.get_rect(center=(self.pos[0], self.slider_top_pos - 15))
         screen.blit(self.text, self.label_rect)
         pygame.mixer.music.set_volume(self.get_value() * 0.01)
-

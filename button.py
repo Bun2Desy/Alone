@@ -2,6 +2,7 @@ import pygame
 from pygame import *
 from info import *
 
+
 class Button:
     """Button object
     :param image: button image
@@ -11,6 +12,7 @@ class Button:
     :param is_hovered: status of hover for button
     :type is_hovered: bool
     """
+
     def __init__(self, x, y, width, height, text, image_path, difficulty=None):
         """Creates button object
         :param x: x coordinate top-left
@@ -38,7 +40,7 @@ class Button:
         self.image = pygame.transform.scale(self.image, (width, height))
         self.rect = self.image.get_rect(topleft=(x, y))
         self.is_hovered = False
-        if difficulty != None:
+        if difficulty is not None:
             self.difficulty = difficulty
 
     def draw(self, screen):
@@ -51,7 +53,7 @@ class Button:
 
         font = pygame.font.SysFont('Corbel', 32)
         text_view = font.render(self.text, True, RED) if self.is_hovered else font.render(self.text, True,
-                                                                                                  WHITE)
+                                                                                          WHITE)
         text_rect = text_view.get_rect(center=self.rect.center)
         screen.blit(text_view, text_rect)
 
