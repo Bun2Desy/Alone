@@ -88,8 +88,8 @@ def hero_game(hero):
                 change = True
 
             if event.type == ghost_timer and countghost < maxi:
-                x = randint(indent[0], fence_size[0] // 2)
-                y = randint(indent[1], fence_size[1] // 2)
+                x = randint(indent[0], fence_size[0])
+                y = randint(indent[1], fence_size[1])
                 if not(pygame.Rect(x, y, 35, 35).colliderect(
                         pygame.Rect(hero.x, hero.y, hero.hitbox.height + 10, hero.hitbox.width + 10))):
                     enemi.append(Ghost(x, y, 35, 35))
