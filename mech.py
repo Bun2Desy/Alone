@@ -27,6 +27,12 @@ change = True
 
 
 def hero_game(hero):
+    """Game play
+    :param hero: hero object
+    :type hero: __main__.Hero
+    :return: True
+    :rtype: bool
+    """
     global game_over, open_door, countghost, change, blocks, blocks_without_door, enter_door, exit_door, number_room, maxi, time_spawn, killghost, kills, last_damage
     if game_over:
         game_over = False
@@ -47,7 +53,6 @@ def hero_game(hero):
     else:
         if change:
             blocks, blocks_without_door, enter_door, exit_door = maps_generation()
-            # hero = Hero(enter_door.door_box.x, enter_door.door_box.y, 30, 60,USERNAME,read_settings()['difficulty'])
             hero.start_pos(enter_door.door_box.x, enter_door.door_box.y)
             countghost = 0
             number_room += 1
@@ -82,12 +87,11 @@ def hero_game(hero):
                 killghost = 0
                 change = True
 
-            # ghost spawn
             if event.type == ghost_timer and countghost < maxi:
                 x = randint(indent[0], fence_size[0] // 2)
                 y = randint(indent[1], fence_size[1] // 2)
-                if pygame.Rect(x, y, 35, 35).colliderect(
-                        pygame.Rect(hero.x, hero.y, hero.hitbox.height + 10, hero.hitbox.width + 10)) == False:
+                if not(pygame.Rect(x, y, 35, 35).colliderect(
+                        pygame.Rect(hero.x, hero.y, hero.hitbox.height + 10, hero.hitbox.width + 10))):
                     enemi.append(Ghost(x, y, 35, 35))
                     countghost += 1
         move = (hero.speed * (click_status[pygame.K_d] - click_status[pygame.K_a]),
@@ -98,7 +102,6 @@ def hero_game(hero):
         hero.set_pos(move_x, move_y)
         hero.step_fence(move, blocks_without_door)
 
-        # chase_ghosts
         for angry in enemi:
             angry.chase(hero.x + random.choice([0, 25, 50]), hero.y + random.choice([0, 25, 50]))
 
@@ -106,25 +109,19 @@ def hero_game(hero):
             if angry.hitbox.colliderect(hero.hitbox) and time.time() - last_damage >= 1:
                 hero.health -= 1
                 last_damage = time.time()
-                # game_over = True
         if hero.health <= 0:
             game_over = True
 
-        # screen.fill(GREY)
         enter_door.draw(hero, open_door)
         exit_door.draw(hero, open_door)
 
-        # move_sprite_draw
-        hero.redrawgamehero(screen)
-
-        # pygame.draw.rect(screen, WHITE, hero.hitbox, 1)
         for i in blocks_without_door:
             pygame.draw.rect(screen, WHITE, i, 1)
 
         for angry in enemi:
             screen.blit(ghost_sprite, (angry.x - 23, angry.y - 23))
-            # pygame.draw.rect(screen, RED, angry.hitbox, 1)
 
+        hero.redrawgamehero(screen)
 
         for bull in bullets:
             pygame.draw.circle(screen, YELLOW, (bull.x, bull.y), bullet_radius)
@@ -149,16 +146,12 @@ def hero_game(hero):
             if bull.collide_with_wall(blocks):
                 bullets.remove(bull)
 
-        # print(len(bullets))
-
-        # check_ghost_alive
         for ghost in enemi:
             if ghost.is_dead:
                 enemi.remove(ghost)
-        # draw items
+
         for i in Items:
             i.render(screen)
-            # pygame.draw.rect(screen, (0, 0, 255), i.hitbox, 1)
             if i.hitbox.colliderect(hero.hitbox) and i.type == "key":
                 open_door = i.collision(hero)
             elif i.hitbox.colliderect(hero.hitbox):
