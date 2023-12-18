@@ -1,4 +1,5 @@
 import sqlite3
+from Exceptions import *
 
 
 def set_score_database(name, score, difficulty):
@@ -13,12 +14,19 @@ def set_score_database(name, score, difficulty):
     '''
     create_table(difficulty)
 
+    if score < 0:
+        raise NegativeScoreError
+    if len(name) > 10:
+        raise OverflowError
+    if not name.isalpha():
+        raise WrongNameSyntaxError
+
     scoreboard_connect = sqlite3.connect('scoreboard.db')
     cursor = scoreboard_connect.cursor()
 
     cursor.execute(f'SELECT * FROM {difficulty} WHERE name="{name}";')
     response = cursor.fetchone()
-    if response != None:
+    if response is not None:
         if response[1] < score:
             cursor.execute(f'UPDATE {difficulty} SET score="{score}" WHERE name="{name}";')
     else:
@@ -61,6 +69,8 @@ def create_table(table_name):
     :type table_name: str
     :returns: None
     '''
+    if table_name not in ["Normal", "Hard", "Hardcore"]:
+        raise DifficultyError
     scoreboard_connect = sqlite3.connect('scoreboard.db')
     cursor = scoreboard_connect.cursor()
     cursor.execute(f'''
