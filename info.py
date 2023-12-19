@@ -76,3 +76,9 @@ stand = pygame.transform.scale(pygame.image.load('movesprites/stand/Sprite-0003.
 
 # move_sprites_lists_ghost
 ghost_sprite = pygame.transform.scale(pygame.image.load('movesprites/enemy/ghostmove4.png'), (80, 80))
+
+# hearts,broken hearts sprites
+pic_heart = pygame.transform.scale(pygame.image.load('objects/heart.png'), (70, 70))
+pic_broken_heart = pygame.transform.scale(pygame.image.load('objects/mybroken_heart.png'), (70, 70))
+pic_lack_mana_point = pygame.transform.scale(pygame.image.load('objects/lack_of_mana_point.png'), (70, 70))
+pic_mana_point = pygame.transform.scale(pygame.image.load('objects/mana_point.png'), (70, 70))

@@ -1,9 +1,9 @@
-from random import randint, choices
+from random import choices
 import pygame
 from info import *
 
 
-class Unit():
+class Unit:
     """Unit object
     :param x: unit x-axis coordinate
     :type x: int
@@ -44,7 +44,7 @@ class Unit():
         :returns: (self.x,self.y)
         :rtype: tuple
         """
-        return (self.x, self.y)
+        return self.x, self.y
 
 
 class Ghost(Unit):
@@ -160,7 +160,7 @@ class Hero(Unit):
         if self.mana > 5:
             self.mana = 5
 
-    def redrawgamehero(self, screen):
+    def redraw_game_hero(self, screen):
         """Draws moving sprites of hero on display of game
         :param screen: display of game
         :type screen: pygame.surface.Surface
@@ -192,31 +192,27 @@ class Hero(Unit):
         """
         if self.difficulty == "Normal":
             if self.health == 3:
-                screen.blit(pygame.transform.scale(pygame.image.load('objects/heart.png'), (70, 70)), (WIDTH - 120, 10))
-                screen.blit(pygame.transform.scale(pygame.image.load('objects/heart.png'), (70, 70)), (WIDTH - 90, 10))
-                screen.blit(pygame.transform.scale(pygame.image.load('objects/heart.png'), (70, 70)), (WIDTH - 60, 10))
+                screen.blit(pic_heart, (WIDTH - 120, 10))
+                screen.blit(pic_heart, (WIDTH - 90, 10))
+                screen.blit(pic_heart, (WIDTH - 60, 10))
             elif self.health == 2:
-                screen.blit(pygame.transform.scale(pygame.image.load('objects/heart.png'), (70, 70)), (WIDTH - 120, 10))
-                screen.blit(pygame.transform.scale(pygame.image.load('objects/heart.png'), (70, 70)), (WIDTH - 90, 10))
-                screen.blit(pygame.transform.scale(pygame.image.load('objects/mybroken_heart.png'), (70, 70)),
-                            (WIDTH - 60, 10))
+                screen.blit(pic_heart, (WIDTH - 120, 10))
+                screen.blit(pic_heart, (WIDTH - 90, 10))
+                screen.blit(pic_broken_heart, (WIDTH - 60, 10))
             elif self.health == 1:
-                screen.blit(pygame.transform.scale(pygame.image.load('objects/heart.png'), (70, 70)), (WIDTH - 120, 10))
-                screen.blit(pygame.transform.scale(pygame.image.load('objects/mybroken_heart.png'), (70, 70)),
-                            (WIDTH - 90, 10))
-                screen.blit(pygame.transform.scale(pygame.image.load('objects/mybroken_heart.png'), (70, 70)),
-                            (WIDTH - 60, 10))
+                screen.blit(pic_heart, (WIDTH - 120, 10))
+                screen.blit(pic_broken_heart, (WIDTH - 90, 10))
+                screen.blit(pic_broken_heart, (WIDTH - 60, 10))
         elif self.difficulty == "Hard":
             if self.health == 2:
-                screen.blit(pygame.transform.scale(pygame.image.load('objects/heart.png'), (70, 70)), (WIDTH - 90, 10))
-                screen.blit(pygame.transform.scale(pygame.image.load('objects/heart.png'), (70, 70)), (WIDTH - 60, 10))
+                screen.blit(pic_heart, (WIDTH - 90, 10))
+                screen.blit(pic_heart, (WIDTH - 60, 10))
             elif self.health == 1:
-                screen.blit(pygame.transform.scale(pygame.image.load('objects/heart.png'), (70, 70)), (WIDTH - 90, 10))
-                screen.blit(pygame.transform.scale(pygame.image.load('objects/mybroken_heart.png'), (70, 70)),
-                            (WIDTH - 60, 10))
+                screen.blit(pic_heart, (WIDTH - 90, 10))
+                screen.blit(pic_broken_heart, (WIDTH - 60, 10))
         else:
             if self.health == 1:
-                screen.blit(pygame.transform.scale(pygame.image.load('objects/heart.png'), (70, 70)), (WIDTH - 60, 10))
+                screen.blit(pic_heart, (WIDTH - 60, 10))
 
     def draw_mana(self, screen):
         """Draws mana points on display of game
@@ -251,7 +247,7 @@ class Hero(Unit):
                 break
 
 
-class Bullet():
+class Bullet:
     """Bullet object
     :param x: generation bullet x position
     :type x: int
@@ -285,7 +281,6 @@ class Bullet():
         self.speed = 3
         self.radius = 5
 
-    # calculate function using coordinates
     def culc_function(self):
         """Culculate function of bullet movement
         :returns: None
@@ -333,7 +328,7 @@ class Bullet():
         return False
 
 
-class Item():
+class Item:
     """Item object
     :param x: item x position
     :type x: int
@@ -391,7 +386,7 @@ class Item():
         """Return True if type=='key' and removes items from display
         :param hero: hero object
         :type hero: __main__.Hero
-        :returns: True
+        :returns: ability to open door
         :rtype: bool
         """
         if self.hitbox.colliderect(hero.hitbox):
@@ -401,6 +396,7 @@ class Item():
             if self.type == 'key':
                 Items.remove(self)
                 return True
+            return None
 
 
 class Door:
@@ -451,11 +447,12 @@ class Door:
         :type hero: __main__.Hero
         :param open_door: door openness
         :type open_door: bool
-        :returns: True
+        :returns: door openness
         :rtype: bool
         """
         if self.door_box.colliderect(hero.hitbox) and open_door:
             return True
+        return False
 
 
 class Score:

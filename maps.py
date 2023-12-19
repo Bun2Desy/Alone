@@ -1,5 +1,5 @@
 import random
-from Units import Door
+from units import Door
 import pygame
 
 

@@ -1,11 +1,11 @@
 import random
 import time
 import pygame
-from Units import *
+from units import Bullet, Ghost, Item, Score
 from random import randint
 from info import *
-from Maps import maps_generation
-from sqll import *
+from maps import maps_generation
+from sqll import set_score_database
 
 pygame.init()
 clock = pygame.time.Clock()
@@ -30,7 +30,7 @@ def hero_game(hero):
     """Game play
     :param hero: hero object
     :type hero: __main__.Hero
-    :return: True
+    :return: the end of game
     :rtype: bool
     """
     global game_over, open_door, countghost, change, blocks, blocks_without_door, enter_door, exit_door, number_room, \
@@ -47,7 +47,6 @@ def hero_game(hero):
         killghost = 0
         for key in click_status:
             click_status[key] = 0
-        create_table(hero.difficulty)
         set_score_database(hero.name, kills, hero.difficulty)
         kills = 0
         return True

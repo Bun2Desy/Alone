@@ -1,5 +1,4 @@
 import pygame
-from pygame import *
 from info import *
 
 
