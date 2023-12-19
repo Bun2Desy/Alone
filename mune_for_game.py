@@ -4,9 +4,10 @@ from button import Button
 from trymusic import Slider
 from mech import hero_game
 from info import *
-from Units import Hero
-from settings import *
-from sqll import *
+from units import Hero
+from settings import load_settings, read_settings
+from sqll import get_score_database
+from exceptions import InvalidDictionaryError, VolumeError, DifficultyError
 
 pygame.init()
 
@@ -79,14 +80,19 @@ def play_game():
     """
     WIDTH, HEIGHT = 1000, 750
     screen = pygame.display.set_mode([WIDTH, HEIGHT])
-    hero = Hero(0, 0, 30, 60, USERNAME, read_settings()['difficulty'])
+    try:
+        read_settings()
+    except (InvalidDictionaryError, VolumeError, DifficultyError):
+        default_data = {"volume": 0.5, "difficulty": "Normal"}
+        load_settings(default_data)
+    finally:
+        hero = Hero(0, 0, 30, 60, USERNAME, read_settings()['difficulty'])
+        while True:
+            screen.fill((120, 120, 120))
+            if hero_game(hero):
+                break
 
-    while True:
-        screen.fill((120, 120, 120))
-        if hero_game(hero):
-            break
-
-        pygame.display.update()
+            pygame.display.update()
 
 
 def lose_game():
@@ -153,25 +159,31 @@ def scoreboard_menu():
     """
     smallfont = pygame.font.SysFont('Corbel', 20)
     back_menu_button = Button(150, 450, 239, 48, 'Back', 'menu/button.png')
-    table = get_score_database(read_settings()['difficulty'])
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            if event.type == pygame.USEREVENT and event.button == back_menu_button:
-                main_menu()
-            back_menu_button.handle_event(event)
-        back_menu_button.check_hover(pygame.mouse.get_pos())
-        back_menu_button.draw(screen)
-        screen.blit(smallfont.render(read_settings()['difficulty'], True, RED), (110, 50))
-        next_indent = 0
-        for result in range(len(table)):
-            screen.blit(smallfont.render(str(result + 1), True, WHITE), (70, 90 + next_indent))
-            screen.blit(smallfont.render(str(table[result][0]), True, WHITE), (100, 90 + next_indent))
-            screen.blit(smallfont.render(str(table[result][1]), True, WHITE), (200, 90 + next_indent))
-            next_indent += 30
-        pygame.display.flip()
+    try:
+        read_settings()
+    except (InvalidDictionaryError, VolumeError, DifficultyError):
+        default_data = {"volume": 0.5, "difficulty": "Normal"}
+        load_settings(default_data)
+    finally:
+        table = get_score_database(read_settings()['difficulty'])
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.USEREVENT and event.button == back_menu_button:
+                    main_menu()
+                back_menu_button.handle_event(event)
+            back_menu_button.check_hover(pygame.mouse.get_pos())
+            back_menu_button.draw(screen)
+            screen.blit(smallfont.render(read_settings()['difficulty'], True, RED), (110, 50))
+            next_indent = 0
+            for result in range(len(table)):
+                screen.blit(smallfont.render(str(result + 1), True, WHITE), (70, 90 + next_indent))
+                screen.blit(smallfont.render(str(table[result][0]), True, WHITE), (100, 90 + next_indent))
+                screen.blit(smallfont.render(str(table[result][1]), True, WHITE), (200, 90 + next_indent))
+                next_indent += 30
+            pygame.display.flip()
 
 
 def setting_menu():
@@ -210,6 +222,11 @@ def music_settings():
     """
     screen.fill(BLACK)
     screen.blit(main_background, (-200, 0))
+    try:
+        read_settings()
+    except (InvalidDictionaryError, VolumeError, DifficultyError):
+        default_data = {"volume": 0.5, "difficulty": "Normal"}
+        load_settings(default_data)
     data = read_settings()
     volume = data['volume']
 
@@ -264,6 +281,11 @@ def difficulty_settings():
     Hard_button = Button(150, 225, 239, 48, 'Hard', 'menu/button.png', 'Hard')
     Hardcore_button = Button(150, 325, 239, 48, 'Hardcore', 'menu/button.png', 'Hardcore')
     back_button = Button(150, 425, 239, 48, 'Back', 'menu/button.png')
+    try:
+        read_settings()
+    except (InvalidDictionaryError, VolumeError, DifficultyError):
+        default_data = {"volume": 0.5, "difficulty": "Normal"}
+        load_settings(default_data)
     data = read_settings()
     difficulty = data['difficulty']
     clickbut1 = 0
