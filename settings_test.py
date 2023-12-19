@@ -1,7 +1,7 @@
 import pytest
-from Exceptions import *
+from exceptions import InvalidDictionaryError, DifficultyError, VolumeError
 from settings import load_settings, read_settings
-from unittest.mock import *
+from unittest.mock import patch
 
 
 @patch('json.dump')

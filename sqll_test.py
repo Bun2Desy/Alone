@@ -1,8 +1,8 @@
-from unittest.mock import *
+from unittest.mock import patch, Mock
 from sqll import set_score_database, get_score_database
 import pytest
 import sqlite3
-from Exceptions import *
+from exceptions import DifficultyError, NegativeScoreError, WrongNameSyntaxError
 
 
 def test_get_score_database():

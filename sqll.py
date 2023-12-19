@@ -1,5 +1,5 @@
 import sqlite3
-from Exceptions import *
+from exceptions import NegativeScoreError, WrongNameSyntaxError, DifficultyError
 
 
 def set_score_database(name, score, difficulty):

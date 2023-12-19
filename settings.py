@@ -1,5 +1,5 @@
 import json
-from Exceptions import *
+from exceptions import InvalidDictionaryError, VolumeError, DifficultyError
 
 
 def load_settings(data):
