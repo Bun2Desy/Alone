@@ -10,7 +10,7 @@ def load_settings(data):
     """
     if data.get("volume") is None or data.get("difficulty") is None:
         raise InvalidDictionaryError
-    if data.get("volume") not in [i / 100 for i in range(101)]:
+    if data.get("volume") not in [i / 1000 for i in range(1001)]:
         raise VolumeError
     if data.get("difficulty") not in ["Normal", "Hard", "Hardcore"]:
         raise DifficultyError
@@ -27,7 +27,7 @@ def read_settings():
         settings = json.load(settings_file)
     if settings.get("volume") is None or settings.get("difficulty") is None:
         raise InvalidDictionaryError
-    if settings.get("volume") not in [i / 100 for i in range(101)]:
+    if settings.get("volume") not in [i / 1000 for i in range(1001)]:
         raise VolumeError
     if settings.get("difficulty") not in ["Normal", "Hard", "Hardcore"]:
         raise DifficultyError
