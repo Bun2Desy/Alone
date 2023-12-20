@@ -123,7 +123,7 @@ def hero_game(hero):
         for angry in enemi:
             screen.blit(ghost_sprite, (angry.x - 23, angry.y - 23))
 
-        hero.redrawgamehero(screen)
+        hero.redraw_game_hero(screen)
 
         for bull in bullets:
             pygame.draw.circle(screen, YELLOW, (bull.x, bull.y), bullet_radius)
