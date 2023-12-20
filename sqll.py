@@ -3,7 +3,7 @@ from exceptions import NegativeScoreError, WrongNameSyntaxError, DifficultyError
 
 
 def set_score_database(name, score, difficulty):
-    '''Load new result in database
+    """Load new result in database
     :param name: hero name
     :type name: str
     :param score: hero score
@@ -11,7 +11,7 @@ def set_score_database(name, score, difficulty):
     :param difficulty: game difficulty
     :type difficulty: str
     :returns: None
-    '''
+    """
     create_table(difficulty)
 
     if score < 0:
@@ -48,12 +48,12 @@ def set_score_database(name, score, difficulty):
 
 
 def get_score_database(difficulty):
-    '''Get data from database
+    """Get data from database
     :param difficulty: game difficulty
     :type difficulty: str
     :returns: data from database
     :rtype: list
-    '''
+    """
     create_table(difficulty)
 
     scoreboard_connect = sqlite3.connect('scoreboard.db')
@@ -64,11 +64,11 @@ def get_score_database(difficulty):
 
 
 def create_table(table_name):
-    '''Create table
+    """Create table
     :param table_name: name of the table
     :type table_name: str
     :returns: None
-    '''
+    """
     if table_name not in ["Normal", "Hard", "Hardcore"]:
         raise DifficultyError
     scoreboard_connect = sqlite3.connect('scoreboard.db')

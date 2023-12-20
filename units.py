@@ -176,10 +176,10 @@ class Hero(Unit):
             screen.blit(walkLeft[walkcount // 3], (self.x - 25, self.y - 15))
             walkcount += 1
         elif click_status[pygame.K_w] == 1 and click_status[pygame.K_d] == 0 and click_status[pygame.K_a] == 0:
-            screen.blit(walkUP[walkcount // 3], (self.x - 25, self.y - 15))
+            screen.blit(walkUP[walkcount // 2], (self.x - 25, self.y - 15))
             walkcount += 1
         elif click_status[pygame.K_s] == 1 and click_status[pygame.K_d] == 0 and click_status[pygame.K_a] == 0:
-            screen.blit(walkDOWN[walkcount // 3], (self.x - 25, self.y - 15))
+            screen.blit(walkDOWN[walkcount // 2], (self.x - 25, self.y - 15))
             walkcount += 1
         else:
             screen.blit(stand, (self.x - 25, self.y - 15))
@@ -261,6 +261,16 @@ class Bullet:
     :type speed: int
     :param radius: bullet radius
     :type radius: int
+    :param delta_x: target x position - bullet generation x position
+    :type delta_x: int
+    :param delta_y: target y position - bullet generation y position
+    :type delta_y: int
+    :param k: k argument line
+    :type k: float
+    :param b: b argument line
+    :type b: float
+    :param speed_of_change: speed change x position
+    :type speed_of_change: float
     """
 
     def __init__(self, hero_pos_x, hero_pos_y, mouse_pos_x, mouse_pos_y):

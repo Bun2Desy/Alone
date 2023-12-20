@@ -3,11 +3,11 @@ from exceptions import InvalidDictionaryError, VolumeError, DifficultyError
 
 
 def load_settings(data):
-    '''Save new settings
+    """Save new settings
     :param data: volume and difficulty value
     :type data: dict
     :returns: None
-    '''
+    """
     if data.get("volume") is None or data.get("difficulty") is None:
         raise InvalidDictionaryError
     if data.get("volume") not in [i / 100 for i in range(101)]:
@@ -19,10 +19,10 @@ def load_settings(data):
 
 
 def read_settings():
-    '''Get settings information
+    """Get settings information
     :returns: volume and difficulty value
     :rtype: dict
-    '''
+    """
     with open('settings.txt') as settings_file:
         settings = json.load(settings_file)
     if settings.get("volume") is None or settings.get("difficulty") is None:
