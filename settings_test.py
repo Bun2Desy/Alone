@@ -4,11 +4,11 @@ from settings import load_settings, read_settings
 from unittest.mock import patch
 
 
-@patch('json.dump')
-def test_load_settings(mockjson):
+@patch('builtins.open')
+def test_load_settings(mockfile):
     data = {"volume": 0.5, "difficulty": "Hard"}
     load_settings(data)
-    mockjson.assert_called()
+    mockfile.assert_called()
 
 
 def test_exc_1_load_settings():
